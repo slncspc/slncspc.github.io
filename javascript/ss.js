@@ -1,7 +1,10 @@
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
-camera.position.set(-12, 3, -14);
-camera.rotation.set(0, 0, 0);
+
+var player = {speed: 0.2, turnSpeed: Math.PI*0.02, height: 2};
+
+camera.position.set(0, player.height, -5);
+camera.lookAt(new THREE.Vector3(0,player.height,0));
 
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize( window.innerWidth, window.innerHeight );
@@ -70,12 +73,52 @@ for(var i = 0; i < 10; i++) {
 
 scene.add(duck);
 
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2();
+
+var keyboard = {};
+
 var animate = function () {
 	requestAnimationFrame( animate );
 
+	if(keyboard[87]){
+		camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
+		camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
+	}
+	if(keyboard[83]){
+		camera.position.x += Math.sin(camera.rotation.y) * player.speed;
+		camera.position.z += -Math.cos(camera.rotation.y) * player.speed;
+	}
+	if(keyboard[65]){
+		camera.position.x += Math.sin(camera.rotation.y + Math.PI/2) * player.speed;
+		camera.position.z += -Math.cos(camera.rotation.y + Math.PI/2) * player.speed;
+	}
+	if(keyboard[68]){
+		camera.position.x += Math.sin(camera.rotation.y - Math.PI/2) * player.speed;
+		camera.position.z += -Math.cos(camera.rotation.y - Math.PI/2) * player.speed;
+	}
 	
+	if(keyboard[37]){
+		camera.rotation.y -= player.turnSpeed;
+	}
+	if(keyboard[39]){
+		camera.rotation.y += player.turnSpeed;
+	}
 
 	renderer.render( scene, camera );
 };
+
+
+function keyDown(event){
+	keyboard[event.keyCode] = true;
+}
+
+function keyUp(event){
+	keyboard[event.keyCode] = false;
+}
+
+window.addEventListener('keydown', keyDown);
+window.addEventListener('keyup', keyUp);
+
 
 animate();
